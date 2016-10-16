@@ -8,9 +8,14 @@ if(isset($_GET) && !empty($_GET['id'])){
 	$id=$_GET['id'];
 	$stmt=$db->prepare("DELETE FROM contact_lists WHERE contact_lists_id=?");
 
-	$stmt->execute([
-		$id
-	]);
+	if($stmt->execute([
+			$id
+		])){
+			echo json_encode(['error'=>'0']);
+		}else{
+			echo json_encode(['error'=>'1']);
+		};
+		exit();
 }else if(isset($_POST) && !empty($_POST)){
 	$name=stripcslashes($_POST['name']);
 	$description=stripcslashes($_POST['description']);
@@ -76,7 +81,7 @@ while($contact_list=$stmt->fetch(PDO::FETCH_OBJ)){
 					<td><?= $contact_list->description?></td>
 					<td><a href="contact.php?id=<?= $contact_list->contact_lists_id?>">Перейти</a></td>
 					<td>
-						<a href="contacts.php?id=<?= $contact_list->contact_lists_id?>" class="btn btn-warning">Удалить</a>
+						<a href="contacts.php?id=<?= $contact_list->contact_lists_id?>" class="btn btn-warning remove">Удалить</a>
 					</td>
 				</tr>
 			<?php } ?>

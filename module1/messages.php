@@ -10,9 +10,14 @@ if(isset($_GET['action']) && !empty($_GET['action'])){
 
 		$stmt=$db->prepare("DELETE FROM messages_sent WHERE message_sent_id=?");
 
-		$stmt->execute([
-				$id
-			]);
+		if($stmt->execute([
+			$id
+		])){
+			echo json_encode(['error'=>'0']);
+		}else{
+			echo json_encode(['error'=>'1']);
+		};
+		exit();
 	}
 }
 
@@ -50,7 +55,7 @@ while($message=$stmt->fetch(PDO::FETCH_OBJ)){
 					</td>
 					<td><?=$message->subject?></td>
 					<td><?=$message->html_message?></td>
-					<td><a href="?action=delete&id=<?=$message->message_sent_id?>">delete</a></td>
+					<td><a href="?action=delete&id=<?=$message->message_sent_id?>" class="remove">delete</a></td>
 				</tr>
 			<?php } ?>
 		</tbody>
