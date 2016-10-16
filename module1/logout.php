@@ -1,8 +1,7 @@
 <?php 
 
-	require_once('helpers/protect_from_guest.php');
+	require_once 'config/app.php';
 
 	session_destroy();
 
-	header('Location: index.php');
-	exit();
+	Redirect::to('index');

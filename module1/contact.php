@@ -1,8 +1,6 @@
 ﻿<?php
 
-require_once('helpers/protect_from_guest.php');
-
-require_once('helpers/dbconnect.php');
+require_once 'config/app.php';
 
 if(isset($_GET) && !empty($_GET['id'])){
 
@@ -12,9 +10,7 @@ if(isset($_GET) && !empty($_GET['id'])){
 		$name=stripcslashes($_POST['name']);
 		$surname=stripcslashes($_POST['surname']);
 		$email=stripcslashes($_POST['email']);
-		$stmt=$db->prepare("INSERT INTO contacts(name,surname,email,contact_lists_id) VALUES(?,?,?,?)");
-
-		$stmt->execute([
+		$stmt=$db->query("INSERT INTO contacts(name,surname,email,contact_lists_id) VALUES(?,?,?,?)",[
 			$name,
 			$surname,
 			$email,
@@ -22,16 +18,10 @@ if(isset($_GET) && !empty($_GET['id'])){
 		]);
 	}
 
-	$stmt=$db->prepare("SELECT c.* FROM contacts as c INNER JOIN contact_lists as c_l ON c.contact_lists_id=c_l.contact_lists_id WHERE c_l.contact_lists_id=? AND c_l.users_id=?");
-	$stmt->execute([
+	$contacts=$db->query("SELECT c.* FROM contacts as c INNER JOIN contact_lists as c_l ON c.contact_lists_id=c_l.contact_lists_id WHERE c_l.contact_lists_id=? AND c_l.users_id=?",[
 		$id,
 		$_SESSION['user_id']
-	]);
-
-	$contacts=[];
-	while($contact=$stmt->fetch(PDO::FETCH_OBJ)){
-		$contacts[]=$contact;
-	}
+	])->get();
 }else{
 	header('Location: contacts.php');
 	exit();

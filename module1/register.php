@@ -1,22 +1,19 @@
 ﻿<?php
-	require_once('helpers/protect_from_logined.php');
+	require_once 'config/app.php';
 
-	require_once('helpers/dbconnect.php');
+	Guard::protect(false);
 
 	if(isset($_POST) && !empty($_POST)){
 		$name=stripcslashes($_POST['username']);
 		$password=stripcslashes(sha1($_POST['password']));
+		$email=stripcslashes($_POST['email']);
 
-		$stmt=$db->prepare("INSERT INTO users(username, password) VALUES(?,?)");
-
-		$stmt->execute([
+		$db->query("INSERT INTO users(username, password) VALUES(?,?)",
+			[
 			$name,
 			$password
 		]);
-
-		header('Location: index.php');
-
-		exit();
+		Redirect::to('index');
 	}
 
 ?>

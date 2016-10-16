@@ -1,31 +1,23 @@
 ﻿<?php
 
-require_once('helpers/protect_from_guest.php');
+require_once 'config/app.php';
 
-require_once('helpers/dbconnect.php');
+Guard::protect();
 
 if(isset($_GET['action']) && !empty($_GET['action'])){
 	if($_GET['action']==='delete'){
 		$id=stripslashes($_GET['id']);
 
-		$stmt=$db->prepare("DELETE FROM messages_sent WHERE message_sent_id=?");
-
-		$stmt->execute([
+		$db->query("DELETE FROM messages_sent WHERE message_sent_id=?",
+			[
 				$id
 			]);
 	}
 }
 
-$stmt=$db->prepare("SELECT s.* FROM messages_sent AS s WHERE s.user_id=?");
-
-$stmt->execute([
-	$_SESSION['user_id']
-]);
-
-$messages=[];
-while($message=$stmt->fetch(PDO::FETCH_OBJ)){
-	$messages[]=$message;
-}
+$messages=$db->query("SELECT s.* FROM messages_sent AS s WHERE s.user_id=?",[
+		$_SESSION['user_id']
+	])->get();
 
 ?>
 <?php require_once 'layouts/header.php';?>

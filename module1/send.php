@@ -1,15 +1,8 @@
 ﻿<?php 
-require_once('helpers/protect_from_guest.php');
-
-require_once('helpers/setsession.php');
-
-require_once('helpers/dbconnect.php');
+require_once 'config/app.php';
 
 
-if(!isset($_SESSION['user_id'])){
-	header('Location: index.php');
-	exit();
-}
+Guard::protect();
 
 if(isset($_POST) && !empty($_POST)){
 	$contact_list_id=stripcslashes($_POST['contact_lists_id']);
@@ -48,16 +41,9 @@ if(isset($_POST) && !empty($_POST)){
 		}
 	}
 }
-
-$stmt=$db->prepare("SELECT * from contact_lists WHERE users_id=?");
-$stmt->execute([
+$contact_lists=$db->query("SELECT * from contact_lists WHERE users_id=?",[
 	$_SESSION['user_id']
-]);
-
-$contact_lists=[];
-while($contact_list=$stmt->fetch(PDO::FETCH_OBJ)){
-	$contact_lists[]=$contact_list;
-}
+	])->get();
 ?>
 
 <?php require_once('layouts/header.php');?>

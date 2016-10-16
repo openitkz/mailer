@@ -1,39 +1,28 @@
 ﻿<?php
+require_once 'config/app.php';
 
-require_once('helpers/protect_from_guest.php');
+Guard::protect();
 
-require_once('helpers/dbconnect.php');
 
 if(isset($_GET) && !empty($_GET['id'])){
 	$id=$_GET['id'];
-	$stmt=$db->prepare("DELETE FROM contact_lists WHERE contact_lists_id=?");
-
-	$stmt->execute([
+	$stmt=$db->query("DELETE FROM contact_lists WHERE contact_lists_id=?",[
 		$id
 	]);
 }else if(isset($_POST) && !empty($_POST)){
 	$name=stripcslashes($_POST['name']);
 	$description=stripcslashes($_POST['description']);
 
-	$stmt=$db->prepare("INSERT INTO contact_lists(name,description,users_id) VALUES(?,?,?)");
-
-	$stmt->execute([
+	$db->query("INSERT INTO contact_lists(name,description,users_id) VALUES(?,?,?)",[
 		$name,
 		$description,
 		$_SESSION['user_id']
 	]);
 }
 
-$stmt=$db->prepare("SELECT c.* FROM contact_lists as c INNER JOIN users as u ON u.user_id=c.users_id AND u.user_id=?");
-
-$stmt->execute([
-	$_SESSION['user_id']
-]);
-
-$contact_lists=[];
-while($contact_list=$stmt->fetch(PDO::FETCH_OBJ)){
-	$contact_lists[]=$contact_list;
-}
+$contact_lists=$db->query("SELECT c.* FROM contact_lists as c INNER JOIN users as u ON u.user_id=c.users_id AND u.user_id=?",[
+		$_SESSION['user_id']
+	])->get();
 
 ?>
 

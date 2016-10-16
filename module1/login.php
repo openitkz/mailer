@@ -1,22 +1,19 @@
 <?php
-require_once('helpers/protect_from_logined.php');
+require_once 'config/app.php';
+
+Guard::protect(false);
 
 if(isset($_POST) && !empty($_POST)){
 	$username=stripcslashes($_POST['username']);
 	$password=stripcslashes(sha1($_POST['password']));
 
-	require_once('helpers/dbconnect.php');
+	$res = $db->query("SELECT user_id FROM users WHERE username=? AND password=?",[
+			$username, $password
+		])->first();
 
-	$stmt = $db->prepare("SELECT user_id FROM users WHERE username=? AND password=?");
-
-	$stmt->execute([
-		$username, $password
-	]);
-
-	if($res=$stmt->fetch(PDO::FETCH_OBJ)){
+	if($res){
 		$_SESSION['user_id']=$res->user_id;
-		header('Location: index.php');
-		exit();
+		Redirect::to('index');
 	}else{
 		$errors='Invalid login or password!';
 	}

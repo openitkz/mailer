@@ -1,7 +1,7 @@
 ﻿<?php
-require_once('helpers/protect_from_guest.php');
+require_once 'config/app.php';
 
-require_once('helpers/dbconnect.php');
+Guard::protect();
 
 if(isset($_POST) && !empty($_POST)){
 	$name=stripcslashes($_POST['username']);
@@ -15,25 +15,21 @@ if(isset($_POST) && !empty($_POST)){
 		$sql.=", password=?";
 	}
 
-	$stmt=$db->prepare($sql);
-
-	$updateVars=[$name];
+	$updateVars=[$name,$email];
 	if(isset($password)){
 		$updateVars[]=$password;
 	}
 
-	$stmt->execute($updateVars);
+	$db->query($sql,$updateVars);
 
-	header('Location: profile.php');
-	exit();
+	Redirect::to('index');
 }
 
-$stmt=$db->prepare("SELECT username,password FROM users WHERE user_id=?");
-$stmt->execute([
-	$_SESSION['user_id']
-]);
+$user=$db->query("SELECT username,password FROM users WHERE user_id=?",[
+		$_SESSION['user_id']
+	])->first();
 
-$user=$stmt->fetch(PDO::FETCH_OBJ);
+
 ?>
 <?php 
 	require_once('layouts/header.php');
