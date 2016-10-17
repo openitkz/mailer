@@ -104,4 +104,4 @@ sudo service php5-fpm restart
 
 echo "create database openit" | mysql -u root -p
 
-mysql -u root -p openit < /home/vagrant/code/ibec_test.sql
+mysql -u root -p openit < /home/vagrant/code/openit.sql
